@@ -1,0 +1,93 @@
+export const toolsConfig = [
+  {
+    id: "pdf-to-word-converter",
+    name: "PDF to DOCX Converter",
+    slug: "/tools/pdf-to-word-converter",
+    description: "Convert PDF documents to editable Word DOCX files with unmatched layout preservation.",
+    icon: "ArrowLeftRight",
+    category: "pdf",
+    relatedTools: ["pdf-page-arranger-merger", "pdf-to-text-ocr"],
+    badge: "NEW",
+    isFree: true,
+    isPro: false,
+    iconBgColor: "#6366F1"
+  },
+  {
+    id: "pdf-to-text-ocr",
+    name: "PDF to Text (OCR)",
+    slug: "/tools/pdf-to-text-ocr",
+    description: "Extract clean, layout-aware text from scanned documents, images, and booklets using advanced OCR.",
+    icon: "FileText",
+    category: "pdf",
+    relatedTools: ["pdf-to-word-converter", "ai-chat-document-analyzer"],
+    badge: "PRO",
+    isFree: false,
+    isPro: true,
+    iconBgColor: "#4F46E5"
+  },
+  {
+    id: "ai-chat-document-analyzer",
+    name: "Veda AI Assistant",
+    slug: "/tools/ai-chat-document-analyzer",
+    description: "Interactive real-time model Chat for complex document questions, queries, and contextual updates.",
+    icon: "MessageSquare",
+    category: "content",
+    relatedTools: ["pdf-to-text-ocr", "pdf-to-word-converter", "youtube-seo-title-description-generator"],
+    badge: "BETA",
+    isFree: true,
+    isPro: false,
+    iconBgColor: "#4B7BF5"
+  },
+  {
+    id: "youtube-seo-title-description-generator",
+    name: "YouTube SEO Optimizer",
+    slug: "/tools/youtube-seo-title-description-generator",
+    description: "AI generator for catchy video titles, comprehensive descriptions, tags, and hashtag structures.",
+    icon: "Youtube",
+    category: "content",
+    relatedTools: ["ai-chat-document-analyzer", "pdf-to-text-ocr", "pdf-to-word-converter"],
+    badge: "NEW",
+    isFree: true,
+    isPro: false,
+    iconBgColor: "#E63946"
+  },
+  {
+    id: "pdf-page-arranger-merger",
+    name: "PDF Page Arranger",
+    slug: "/tools/pdf-page-arranger-merger",
+    description: "Visual, interactive board to rearrange, delete, rotate, merge, and split PDF documents freely.",
+    icon: "LayoutGrid",
+    category: "pdf",
+    relatedTools: ["pdf-to-word-converter", "pdf-to-text-ocr"],
+    badge: "NEW",
+    isFree: true,
+    isPro: false,
+    iconBgColor: "#7B5EA7"
+  },
+  {
+    id: "pdf-watermark-remover",
+    name: "PDF Watermark Remover",
+    slug: "/tools/pdf-watermark-remover",
+    description: "Instantly purge repeating watermark elements, branding text, or promotional headers/footers.",
+    icon: "Trash2",
+    category: "pdf",
+    relatedTools: ["pdf-page-arranger-merger", "pdf-to-word-converter", "pdf-to-text-ocr"],
+    badge: "NEW",
+    isFree: true,
+    isPro: false,
+    iconBgColor: "#EF4444"
+  },
+  {
+    id: "mcq-extractor-from-pdf",
+    name: "MCQ Extractor & Bank",
+    slug: "/tools/mcq-extractor-from-pdf",
+    description: "Extract multiple-choice questions from PDFs page-by-page, tag categories, and generate secure passcode test sets.",
+    icon: "ListChecks",
+    category: "pdf",
+    relatedTools: ["pdf-to-text-ocr", "pdf-to-word-converter"],
+    badge: "NEW",
+    isFree: true,
+    isPro: false,
+    iconBgColor: "#F59E0B"
+  }
+];

@@ -1,0 +1,204 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+        request.auth.token.email == "rahulsriwastaw7643@gmail.com" && 
+        request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read, write: if isAdmin();
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+        request.resource.data.keys().hasAll(['uid', 'email']) &&
+        request.resource.data.uid == request.auth.uid;
+      allow update: if isOwner(userId);
+    }
+
+    // History items
+    match /users/{userId}/history/{historyId} {
+      allow read, write: if isAdmin();
+      allow list: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(historyId) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['id', 'userId', 'fileName', 'timestamp', 'pagesCount', 'elements']) &&
+        request.resource.data.elements is list;
+      allow delete: if isOwner(userId);
+    }
+
+    // MCQ conversions
+    match /users/{userId}/mcq_conversions/{docId} {
+      allow read, write: if isAdmin();
+      allow list: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(docId) &&
+        request.resource.data.keys().hasAll(['id', 'fileName', 'timestamp', 'mcqCount']) &&
+        request.resource.data.id == docId &&
+        request.resource.data.fileName is string &&
+        request.resource.data.timestamp is string &&
+        request.resource.data.mcqCount is int &&
+        (!('extractedText' in request.resource.data) || request.resource.data.extractedText is string) &&
+        (!('mcqQuestions' in request.resource.data) || request.resource.data.mcqQuestions is list);
+      allow update: if isOwner(userId) && isValidId(docId) &&
+        request.resource.data.id == docId &&
+        (!('fileName' in request.resource.data) || request.resource.data.fileName is string) &&
+        (!('timestamp' in request.resource.data) || request.resource.data.timestamp is string) &&
+        (!('mcqCount' in request.resource.data) || request.resource.data.mcqCount is int) &&
+        (!('extractedText' in request.resource.data) || request.resource.data.extractedText is string) &&
+        (!('mcqQuestions' in request.resource.data) || request.resource.data.mcqQuestions is list) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fileName', 'mcqCount', 'mcqQuestions', 'timestamp', 'extractedText']);
+      allow delete: if isOwner(userId);
+    }
+
+    // Chat sessions
+    match /users/{userId}/chats/{sessionId} {
+      allow read, write: if isAdmin();
+      allow list: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(sessionId) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['id', 'userId', 'title', 'createdAt', 'updatedAt']);
+      allow update: if isOwner(userId) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasAny(['title', 'updatedAt', 'isPinned']);
+      allow delete: if isOwner(userId);
+    }
+
+    // Chat messages
+    match /users/{userId}/chats/{sessionId}/messages/{messageId} {
+      allow read, write: if isAdmin();
+      allow list: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(messageId) &&
+        request.resource.data.sessionId == sessionId &&
+        request.resource.data.keys().hasAll(['id', 'sessionId', 'role', 'content', 'timestamp']);
+    }
+    // User personal API keys
+    match /users/{userId}/apiKeys/{keyId} {
+      allow read, write: if isAdmin();
+      allow list, get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(keyId) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['id', 'userId', 'keyName', 'keyValue', 'isShared', 'createdAt']);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // Shared API keys (Admin/System Pool)
+    match /shared_api_keys/{keyId} {
+      allow read, write: if isAdmin();
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(keyId) &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['id', 'userId', 'keyName', 'keyValue', 'createdAt']);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Plans Configuration (System-wide)
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // App Settings (e.g. Analytics Configuration)
+    match /settings/{settingId=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Analytics Events & Visits
+    match /analytics/{eventId=**} {
+      allow read: if isSignedIn();
+      allow write: if true; // Let the public client track visits
+    }
+
+    // Payment Tracking
+    match /payments/{paymentId} {
+      allow read, write: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // User Daily Usage Tracking
+    match /users/{userId}/usage/{dateId} {
+      allow read, write: if isAdmin();
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId);
+    }
+
+    // YouTube Creator Profiles
+    match /users/{userId}/creator_profiles/{profileId} {
+      allow read, write: if isAdmin();
+      allow list, get, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidId(profileId);
+    }
+
+    // Question Bank security (Zero-Trust ABAC)
+    match /question_bank/{entryId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    // MCQ Questions Bank
+    match /questions/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // MCQ Questions Staging Workspace
+    match /staging_questions/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Generated Tests / Assessment Sets
+    match /tests/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Question Set security (Zero-Zero ABAC)
+    match /question_set/{setId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    // Question Set Mapping security
+    match /question_set_mapping/{mapId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+    }
+
+    // Set Background Override security
+    match /set_background_override/{overrideId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.user_id == request.auth.uid;
+    }
+  }
+}

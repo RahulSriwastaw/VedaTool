@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      // Polyfill to prevent "Cannot set property fetch of #<Window> which has only a getter"
+      // Some UI libraries or OCR packages try to assign `export fetch = ...` causing crashes.
+      if (typeof window !== 'undefined') {
+        const originalFetch = window.fetch;
+        const fetchDescriptor = {
+          configurable: true,
+          enumerable: true,
+          get: function() { return originalFetch; },
+          set: function(val) { /* ignore or store if needed, but doing nothing prevents the crash */ }
+        };
+        Object.defineProperty(window, 'fetch', fetchDescriptor);
+        if (typeof globalThis !== 'undefined') {
+          try { Object.defineProperty(globalThis, 'fetch', fetchDescriptor); } catch(e){}
+        }
+      }
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VedaTool - Ultimate AI PDF to Text Converter & Veda AI Assistant</title>
+    <meta name="description" content="Free AI-powered VedaTool. Extract text from scanned PDFs, images, and documents with 99.9% accuracy. Preserves layout, tables, and MCQ formats using advanced Veda AI OCR." />
+    <meta name="keywords" content="VedaTool, Veda AI, AI PDF to Text, pdf to text converter, pdf to text, extract text from pdf, OCR converter, scanned pdf to text, image to text, online OCR, MCQ extractor, exam paper digitizer" />
+    <meta property="og:title" content="VedaTool - Extra-Accurate Layout-Aware OCR & Conversational Assistant" />
+    <meta property="og:description" content="Stop losing layouts. VedaTool uses vision-based Veda AI to perfectly extract text, tables, and images from any scanned document." />
+    <meta property="og:image" content="https://pdf-to-text.ai/og-image.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://pdf-to-text.ai" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "VedaTool",
+      "operatingSystem": "Web",
+      "applicationCategory": "UtilityApplication",
+      "description": "An advanced intelligence ecosystem that features accurate layout-preserving PDF conversion, SEO tools, and Veda AI - a powerful conversational assistant.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "AI-powered OCR",
+        "Layout preservation",
+        "MCQ Mode extraction",
+        "Bilingual support",
+        "Cloud history sync",
+        "DOCX export"
+      ]
+    }
+    </script>
+    <!-- PDF.js for rendering PDF pages to images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- Synchronously load properties for secure dynamic Firebase initialization -->
+    <script>
+      (function() {
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET", "/api/firebase-config", false);
+          xhr.send(null);
+          if (xhr.status === 200) {
+            var text = xhr.responseText.trim();
+            if (text.startsWith("<")) {
+              console.warn("Received HTML fallback from config, bypassing parse.");
+            } else {
+              window.__FIREBASE_CONFIG__ = JSON.parse(text);
+            }
+          } else {
+            console.error("Failed to load dynamic Firebase config:", xhr.statusText);
+          }
+        } catch (err) {
+          console.error("Failed to fetch secure Firebase config:", err);
+        }
+      })();
+    </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<link rel="stylesheet" href="/src/index.css">
+</head>
+  <body class="bg-[#0F0F0F] text-[#EFEFEF] font-sans">
+    <div id="root"></div>
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+{
+  "entities": {
+    "HistoryItem": {
+      "title": "History Item",
+      "description": "Information about a past PDF to Word conversion",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "fileName": { "type": "string" },
+        "timestamp": { "type": "integer" },
+        "pagesCount": { "type": "integer" },
+        "elements": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["id", "userId", "fileName", "timestamp", "pagesCount", "elements"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "ChatSession": {
+      "title": "Chat Session",
+      "description": "A conversation with the AI assistant",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "createdAt": { "type": "integer" },
+        "updatedAt": { "type": "integer" },
+        "isPinned": { "type": "boolean" }
+      },
+      "required": ["id", "userId", "title", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "Chat Message",
+      "description": "A single message in a chat session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "sessionId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string" },
+        "timestamp": { "type": "integer" },
+        "files": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["id", "sessionId", "role", "content", "timestamp"]
+    },
+    "McqConversion": {
+      "title": "MCQ Conversion",
+      "description": "Information about a past PDF to MCQ extraction set",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fileName": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "extractedText": { "type": "string" },
+        "mcqCount": { "type": "integer" }
+      },
+      "required": ["id", "fileName", "timestamp", "extractedText", "mcqCount"]
+    },
+    "CreatorProfile": {
+      "title": "Creator Profile",
+      "description": "YouTube channel branding and creator persona context",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "brandingKeywords": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "socialLinks": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "contactInfo": { "type": "string" },
+        "about": { "type": "string" },
+        "defaultDescriptionTemplate": { "type": "string" }
+      },
+      "required": ["id", "name", "brandingKeywords", "socialLinks", "contactInfo", "defaultDescriptionTemplate"]
+    },
+    "QuestionBankEntry": {
+      "title": "Question Bank Entry",
+      "description": "A single digitized question with both Hindi and English options, and validation state",
+      "type": "object",
+      "properties": {
+        "entry_id": { "type": "string" },
+        "qid": { "type": "integer" },
+        "statement_hi": { "type": "string" },
+        "statement_en": { "type": "string" },
+        "subject_tag": { "type": "string" },
+        "topic_tag": { "type": "string" },
+        "choice1_hi": { "type": "string" },
+        "choice1_en": { "type": "string" },
+        "choice2_hi": { "type": "string" },
+        "choice2_en": { "type": "string" },
+        "choice3_hi": { "type": "string" },
+        "choice3_en": { "type": "string" },
+        "choice4_hi": { "type": "string" },
+        "choice4_en": { "type": "string" },
+        "choice5_hi": { "type": "string" },
+        "choice5_en": { "type": "string" },
+        "correct_choice": { "type": "string" },
+        "explanation_hi": { "type": "string" },
+        "explanation_en": { "type": "string" },
+        "pack_name": { "type": "string" },
+        "source_ref": { "type": "string" },
+        "exam_target": { "type": "string" },
+        "origin_table": { "type": "string" },
+        "sync_action": { "type": "string" },
+        "exam_year": { "type": "integer" },
+        "video_ref": { "type": "string" },
+        "question_type": { "type": "string" },
+        "publish_status": { "type": "string", "enum": ["DRAFT", "PUBLISHED_PRIVATE", "PUBLISHED_PUBLIC"] },
+        "difficulty": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] },
+        "revision_code": { "type": "string" },
+        "sync_error_log": { "type": "string" },
+        "created_at": { "type": "integer" },
+        "section_tag": { "type": "string" },
+        "exam_date": { "type": "string" },
+        "visibility": { "type": "string", "enum": ["PRIVATE", "PUBLIC"] },
+        "source": { "type": "string", "enum": ["IMPORTED", "SELF_CREATED"] },
+        "user_id": { "type": "string" },
+        "is_bilingual": { "type": "boolean" }
+      },
+      "required": ["entry_id", "qid", "user_id", "publish_status", "visibility", "source"]
+    },
+    "QuestionSet": {
+      "title": "Question Set",
+      "description": "A set of questions identified by an set_id and set_password",
+      "type": "object",
+      "properties": {
+        "set_entry_id": { "type": "string" },
+        "set_id": { "type": "integer" },
+        "set_password": { "type": "string" },
+        "set_title": { "type": "string" },
+        "set_description": { "type": "string" },
+        "exam_target": { "type": "string" },
+        "subject_tag": { "type": "string" },
+        "user_id": { "type": "string" },
+        "created_at": { "type": "integer" },
+        "bg_type": { "type": "string" },
+        "bg_color": { "type": "string" },
+        "bg_gradient": { "type": "object" },
+        "bg_image_url": { "type": "string" }
+      },
+      "required": ["set_entry_id", "set_id", "set_title", "user_id"]
+    },
+    "SetBackgroundOverride": {
+      "title": "Set Background Override",
+      "description": "Per-user background override for a question set",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "set_entry_id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "bg_type": { "type": "string" },
+        "bg_color": { "type": "string" },
+        "bg_gradient": { "type": "object" },
+        "bg_image_url": { "type": "string" },
+        "updated_at": { "type": "integer" }
+      },
+      "required": ["id", "set_entry_id", "user_id"]
+    },
+    "QuestionSetMapping": {
+      "title": "Question Set Mapping",
+      "description": "Junction table mapping questions to specific sets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "set_entry_id": { "type": "string" },
+        "entry_id": { "type": "string" },
+        "order_index": { "type": "integer" },
+        "user_id": { "type": "string" }
+      },
+      "required": ["id", "set_entry_id", "entry_id", "order_index", "user_id"]
+    }
+  },
+  "firestore": {
+    "question_bank/{entryId}": {
+      "schema": "QuestionBankEntry",
+      "description": "Stores user and public question bank entries"
+    },
+    "question_set/{setId}": {
+      "schema": "QuestionSet",
+      "description": "Stores exam target question sets"
+    },
+    "set_background_override/{overrideId}": {
+      "schema": "SetBackgroundOverride",
+      "description": "Stores user background overrides for VedaSlide"
+    },
+    "question_set_mapping/{mapId}": {
+      "schema": "QuestionSetMapping",
+      "description": "Junction maps for sequencing bank items to sets"
+    },
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profile data"
+    },
+    "users/{userId}/history/{historyId}": {
+      "schema": "HistoryItem",
+      "description": "Stores the user's conversion history"
+    },
+    "users/{userId}/chats/{sessionId}": {
+      "schema": "ChatSession",
+      "description": "User's chat sessions"
+    },
+    "users/{userId}/chats/{sessionId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Messages within a session"
+    },
+    "users/{userId}/mcq_conversions/{docId}": {
+      "schema": "McqConversion",
+      "description": "Stores user's MCQ extraction/conversions history"
+    },
+    "users/{userId}/creator_profiles/{profileId}": {
+      "schema": "CreatorProfile",
+      "description": "User's YouTube creator personas"
+    },
+    "questions/{id}": {
+      "schema": "QuestionBankEntry",
+      "description": "Stores final question bank entries"
+    },
+    "staging_questions/{id}": {
+      "schema": "QuestionBankEntry",
+      "description": "Stores staging/unapproved imported question entries"
+    }
+  }
+}
