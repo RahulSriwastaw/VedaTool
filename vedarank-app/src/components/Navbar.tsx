@@ -17,42 +17,45 @@ export default function Navbar({ user, isAdmin }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-12 bg-[var(--bg-card)]/95 backdrop-blur-xl border-b border-[var(--border)]">
-      <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-1.5">
-          <Zap className="h-4 w-4 text-indigo-400" />
-          <span className="text-sm font-bold text-white tracking-tight">VedaRank</span>
+    <nav className="fixed top-0 left-0 right-0 z-50 h-14 glass border-b border-[var(--border)] transition-all duration-300">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+            <Zap className="h-4 w-4 text-indigo-400" />
+          </div>
+          <span className="text-[15px] font-bold text-zinc-100 tracking-tight group-hover:text-white transition-colors">VedaRank</span>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {user ? (
             <>
               <Link to="/dashboard"
-                className="flex items-center gap-1 px-2.5 py-1 text-xs text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md transition">
-                <LayoutDashboard className="h-3 w-3" />
+                className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-zinc-400 hover:text-zinc-100 hover:bg-white/5 rounded-lg transition-all">
+                <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden sm:inline">Dashboard</span>
               </Link>
               {isAdmin && (
                 <Link to="/super-admin"
-                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-amber-400/80 hover:text-amber-300 hover:bg-amber-950/30 rounded-md transition">
-                  <Shield className="h-3 w-3" />
+                  className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-amber-500/90 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all">
+                  <Shield className="h-4 w-4" />
                   <span className="hidden sm:inline">Admin</span>
                 </Link>
               )}
-              <div className="flex items-center gap-2 ml-2 pl-2 border-l border-zinc-800">
+              <div className="flex items-center gap-3 ml-2 pl-3 border-l border-[var(--border)]">
                 <img
-                  src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'U'}&background=4f46e5&color=fff&size=28`}
-                  alt="" className="h-6 w-6 rounded-full ring-1 ring-zinc-700"
+                  src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'U'}&background=4f46e5&color=fff&size=32`}
+                  alt="Profile" className="h-7 w-7 rounded-full ring-2 ring-indigo-500/20"
+                  referrerPolicy="no-referrer"
                 />
                 <button onClick={handleLogout}
-                  className="p-1 text-zinc-500 hover:text-red-400 transition" title="Logout">
-                  <LogOut className="h-3.5 w-3.5" />
+                  className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all cursor-pointer" title="Logout">
+                  <LogOut className="h-4 w-4" />
                 </button>
               </div>
             </>
           ) : (
             <Link to="/login"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-1.5 rounded-md transition">
+              className="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-[13px] font-semibold px-4 py-2 rounded-lg transition-all shadow-sm shadow-indigo-500/20">
               Sign in
             </Link>
           )}

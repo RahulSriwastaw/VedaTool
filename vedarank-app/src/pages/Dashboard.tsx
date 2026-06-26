@@ -36,66 +36,80 @@ export default function Dashboard({ user }: { user: User }) {
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin h-6 w-6 border-2 border-indigo-500 border-t-transparent rounded-full" /></div>;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-12">
       {/* Header */}
-      <div className="mb-5">
-        <h1 className="text-lg font-bold text-white">Dashboard</h1>
-        <p className="text-xs text-zinc-500">{user.displayName || user.email}</p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">Your Dashboard</h1>
+          <p className="text-[15px] text-zinc-400">Welcome back, <span className="text-zinc-200 font-medium">{user.displayName || user.email}</span></p>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-2 mb-5">
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-indigo-400">{stats.total}</p>
-          <p className="text-[10px] text-zinc-500 uppercase">Submissions</p>
+      <div className="grid grid-cols-3 gap-3 sm:gap-5 mb-8">
+        <div className="glass border border-white/5 rounded-2xl p-5 text-center relative overflow-hidden group hover:border-indigo-500/30 transition-colors">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-3xl font-black text-indigo-400 mb-1 relative z-10">{stats.total}</p>
+          <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest relative z-10">Submissions</p>
         </div>
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-emerald-400">{stats.avgScore}</p>
-          <p className="text-[10px] text-zinc-500 uppercase">Avg Score</p>
+        <div className="glass border border-white/5 rounded-2xl p-5 text-center relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-3xl font-black text-emerald-400 mb-1 relative z-10">{stats.avgScore}</p>
+          <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest relative z-10">Avg Score</p>
         </div>
-        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-zinc-300">{stats.totalQ}</p>
-          <p className="text-[10px] text-zinc-500 uppercase">Questions</p>
+        <div className="glass border border-white/5 rounded-2xl p-5 text-center relative overflow-hidden group hover:border-violet-500/30 transition-colors">
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <p className="text-3xl font-black text-zinc-200 mb-1 relative z-10">{stats.totalQ}</p>
+          <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest relative z-10">Questions</p>
         </div>
       </div>
 
       {/* Submissions */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
-          <span className="text-xs font-semibold text-zinc-300">History</span>
-          <span className="text-[10px] text-zinc-600">{submissions.length} total</span>
+      <div className="glass border border-white/5 rounded-3xl overflow-hidden shadow-xl">
+        <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+          <span className="text-sm font-bold text-zinc-200 tracking-wide">Submission History</span>
+          <span className="text-xs font-semibold text-zinc-500 bg-white/5 px-3 py-1 rounded-full">{submissions.length} total</span>
         </div>
 
         {submissions.length === 0 ? (
-          <div className="py-10 text-center">
-            <Inbox className="h-8 w-8 text-zinc-700 mx-auto mb-2" />
-            <p className="text-xs text-zinc-500">No submissions yet</p>
-            <Link to="/" className="text-xs text-indigo-400 mt-1 inline-block">Analyze your first result →</Link>
+          <div className="py-16 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+              <Inbox className="h-8 w-8 text-zinc-600" />
+            </div>
+            <p className="text-sm font-medium text-zinc-400 mb-2">No submissions yet</p>
+            <Link to="/" className="text-[13px] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">
+              Analyze your first result <ChevronRight className="h-3 w-3" />
+            </Link>
           </div>
         ) : (
-          <div className="divide-y divide-[var(--border)]">
+          <div className="divide-y divide-white/5">
             {submissions.map(sub => {
               const pct = sub.metadata?.totalQuestions ? Math.round((sub.score / sub.metadata.totalQuestions) * 100) : 0;
               return (
                 <Link key={sub.id} to={`/submission/${sub.id}`}
-                  className="flex items-center justify-between px-4 py-2.5 hover:bg-zinc-900/50 transition group">
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 bg-indigo-500/10 rounded-md flex items-center justify-center">
-                      <FileText className="h-3.5 w-3.5 text-indigo-400" />
+                  className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+                      <FileText className="h-5 w-5 text-indigo-400" />
                     </div>
                     <div>
-                      <p className="text-xs text-white font-medium">
-                        {sub.score}/{sub.metadata?.totalQuestions || 0}
-                        <span className={`ml-2 text-[10px] font-bold ${pct >= 70 ? 'text-emerald-400' : pct >= 40 ? 'text-amber-400' : 'text-red-400'}`}>{pct}%</span>
+                      <p className="text-[15px] text-zinc-100 font-bold mb-0.5 flex items-center gap-2">
+                        {sub.score} / {sub.metadata?.totalQuestions || 0}
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${pct >= 70 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : pct >= 40 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                          {pct}%
+                        </span>
                       </p>
-                      <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
-                        <Clock className="h-2.5 w-2.5" />
-                        {sub.metadata?.parsedAt ? new Date(sub.metadata.parsedAt).toLocaleDateString() : ''}
-                        <span>· {sub.inputMode}</span>
+                      <div className="flex items-center gap-2 text-[12px] font-medium text-zinc-500">
+                        <Clock className="h-3 w-3" />
+                        {sub.metadata?.parsedAt ? new Date(sub.metadata.parsedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown Date'}
+                        <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+                        <span className="uppercase tracking-wider text-[10px]">{sub.inputMode}</span>
                       </div>
                     </div>
                   </div>
-                  <ChevronRight className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition" />
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-white/5 transition-colors">
+                    <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-zinc-300 transition-colors" />
+                  </div>
                 </Link>
               );
             })}

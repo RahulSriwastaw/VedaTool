@@ -1,6 +1,7 @@
 import {
   signInWithRedirect,
   getRedirectResult,
+  signInWithPopup,
   User,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -28,7 +29,20 @@ export async function provisionGoogleUser(user: User): Promise<void> {
 }
 
 export async function signInWithGoogle(): Promise<void> {
-  await signInWithRedirect(auth, googleProvider);
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    if (result?.user) {
+      await provisionGoogleUser(result.user);
+    }
+  } catch (err: any) {
+    const code = err?.code || "";
+    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+      console.log("[GoogleAuth] Popup closed by user.");
+      throw err;
+    }
+    console.warn("[GoogleAuth] Popup sign-in failed, trying redirect fallback:", err);
+    await signInWithRedirect(auth, googleProvider);
+  }
 }
 
 export async function handleGoogleRedirectResult(): Promise<User | null> {
@@ -43,3 +57,4 @@ export async function handleGoogleRedirectResult(): Promise<User | null> {
     throw err;
   }
 }
+

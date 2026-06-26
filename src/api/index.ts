@@ -6425,7 +6425,16 @@ app.post("/api/parse-result", async (req, res) => {
   
   try {
     // Support both old format (mode, url, html) and new format (responseSheetUrl, submissionId)
-    const { mode, url, html, responseSheetUrl, submissionId } = req.body;
+    const { mode, html, submissionId } = req.body;
+    let url = req.body.url;
+    let responseSheetUrl = req.body.responseSheetUrl;
+
+    if (typeof url === "string") {
+      url = url.trim().replace(/([^:])\/\/+/g, "$1/");
+    }
+    if (typeof responseSheetUrl === "string") {
+      responseSheetUrl = responseSheetUrl.trim().replace(/([^:])\/\/+/g, "$1/");
+    }
     
     let htmlContent = '';
     let finalSubmissionId = submissionId || crypto.randomBytes(16).toString('hex');
@@ -6520,6 +6529,10 @@ app.post("/api/parse-result", async (req, res) => {
     // Calculate score (simplified - count correct answers)
     const score = questions.filter(q => q.isCorrect).length;
     
+    // Extract student profile data from HTML
+    const studentData = extractStudentDataFromHTML(htmlContent, url || responseSheetUrl || "");
+    console.log("[Student data extracted]:", studentData);
+
     // Extract metadata
     const metadata = {
       totalQuestions: questions.length,
@@ -6533,7 +6546,8 @@ app.post("/api/parse-result", async (req, res) => {
       submissionId: finalSubmissionId,
       questions,
       score,
-      metadata
+      metadata,
+      studentData
     });
     
   } catch (err: any) {
@@ -6590,6 +6604,100 @@ function extractQuestionsFromHTML(html: string): any[] {
   
   return questions;
 }
+
+// Helper function to extract student profile data from HTML
+function extractStudentDataFromHTML(html: string, baseUrl: string): { name: string, roll: string, exam: string, date: string, photoUrl: string } {
+  const result = { name: "", roll: "", exam: "", date: "", photoUrl: "" };
+  
+  try {
+    const cleanText = (str: string) => 
+      str.replace(/<[^>]*>/g, '')
+         .replace(/&nbsp;/g, ' ')
+         .replace(/\s+/g, ' ')
+         .trim();
+
+    // Match standard table rows (key-value columns)
+    const rowPattern = /<tr>\s*<td[^>]*>(.*?)<\/td>\s*<td[^>]*>(.*?)<\/td>\s*<\/tr>/gis;
+    const matches = html.matchAll(rowPattern);
+    
+    for (const match of matches) {
+      const key = cleanText(match[1]).toLowerCase();
+      const val = cleanText(match[2]);
+      
+      if (key === "candidate name" || key === "student name" || (key.includes("name") && !key.includes("center") && !key.includes("subject"))) {
+        result.name = val;
+      } else if (key.includes("roll number") || key.includes("roll no")) {
+        result.roll = val;
+      } else if (key.includes("subject") || key.includes("exam") || key.includes("test paper")) {
+        result.exam = val;
+      } else if (key.includes("test date") || key.includes("date")) {
+        result.date = val;
+      }
+    }
+
+    // Secondary fallback scans
+    if (!result.name) {
+      const nameMatch = html.match(/(?:Candidate Name)[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
+      if (nameMatch) result.name = cleanText(nameMatch[1]);
+    }
+    if (!result.roll) {
+      const rollMatch = html.match(/(?:Roll Number|Roll No)[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
+      if (rollMatch) result.roll = cleanText(rollMatch[1]);
+    }
+    if (!result.exam) {
+      const examMatch = html.match(/(?:Subject|Test Paper)[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
+      if (examMatch) result.exam = cleanText(examMatch[1]);
+    }
+    if (!result.date) {
+      const dateMatch = html.match(/(?:Test Date|Date)[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
+      if (dateMatch) result.date = cleanText(dateMatch[1]);
+    }
+
+    // Scan for candidate photo URL from image tags
+    const imgPattern = /<img[^>]*src=["'](.*?)["']/gis;
+    const imgMatches = html.matchAll(imgPattern);
+    
+    for (const match of imgMatches) {
+      const src = match[1].trim();
+      const srcLower = src.toLowerCase();
+      
+      // Candidate photo check: contains photo, cphoto, candidate, or starts with roll number
+      if (srcLower.includes("photo") || srcLower.includes("cphoto") || srcLower.includes("candidate") || (result.roll && srcLower.includes(result.roll))) {
+        // Exclude signatures or logos if possible
+        if (!srcLower.includes("sign") && !srcLower.includes("logo")) {
+          result.photoUrl = resolveAbsoluteUrl(baseUrl, src);
+          break;
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[extractStudentDataFromHTML error]:", err);
+  }
+  
+  return result;
+}
+
+// Helper function to resolve relative URL to absolute URL
+function resolveAbsoluteUrl(baseUrl: string, relativeUrl: string): string {
+  try {
+    if (!baseUrl) return relativeUrl;
+    if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://") || relativeUrl.startsWith("data:")) {
+      return relativeUrl;
+    }
+    
+    const urlObj = new URL(baseUrl);
+    const pathname = urlObj.pathname;
+    const lastSlashIdx = pathname.lastIndexOf("/");
+    const basePath = lastSlashIdx !== -1 ? pathname.substring(0, lastSlashIdx + 1) : "/";
+    
+    return `${urlObj.origin}${basePath}${relativeUrl}`;
+  } catch (err) {
+    console.error("[resolveAbsoluteUrl error]:", err);
+    return relativeUrl;
+  }
+}
+
+
 
 app.delete("/api/tools/pdf-watermark-remover/session/:id", (req, res) => {
   watermarkSessions.delete(req.params.id);

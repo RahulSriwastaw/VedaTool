@@ -10,24 +10,26 @@
     "server": "node --import tsx server.ts"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "express": "^5.2.1",
+    "firebase": "^12.12.1",
+    "firebase-admin": "^13.10.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.562.0",
+    "motion": "^12.34.3",
+    "nanoid": "^5.1.11",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^7.15.1",
-    "firebase": "^12.12.1",
-    "firebase-admin": "^13.10.0",
-    "express": "^5.2.1",
-    "lucide-react": "^0.562.0",
-    "motion": "^12.34.3",
     "tailwindcss": "^4.2.1",
-    "@tailwindcss/vite": "^4.2.1",
-    "tsx": "^4.21.0",
-    "nanoid": "^5.1.11"
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.14.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/node": "^22.14.0",
-    "@types/express": "^5.0.6",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"

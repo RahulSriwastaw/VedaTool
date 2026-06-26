@@ -101,10 +101,6 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
           </button>
 
           {/* Credits item */}
-          <div onClick={() => navigate("/veda-rank")} className="flex items-center gap-1.5 cursor-pointer hover:bg-[var(--bg-hover)] px-2 py-1 rounded-md transition-colors shrink-0">
-            <Database size={14} className="text-[var(--accent)]" />
-            <span className="text-[11px] font-semibold text-[var(--text-primary)]">VedaRank</span>
-          </div>
           <div onClick={() => navigate("/pricing")} className="flex shrink-0 scale-90 md:scale-100">
              <TokenCounter tokens={tokens} />
           </div>

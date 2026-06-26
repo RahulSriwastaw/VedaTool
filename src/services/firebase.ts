@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore, setLogLevel } from "firebase/firestore";
 
 // Dynamically read/fetch properties for secure initialization
@@ -13,7 +13,7 @@ if (!firebaseConfig) {
     xhr.send(null);
     if (xhr.status === 200) {
       const text = xhr.responseText.trim();
-      if (text.startsWith("<")) {
+      if (text.startsWith("<html")) {
         throw new Error("Received HTML fallback from config endpoint instead of valid JSON.");
       }
       firebaseConfig = JSON.parse(text);
@@ -47,6 +47,16 @@ export const db =
     ? getFirestore(app, databaseId)
     : getFirestore(app);
 export const auth = getAuth(app);
+
+// Set auth persistence to LOCAL to remember the user across sessions
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("[Firebase] Auth persistence set to LOCAL");
+  })
+  .catch((error) => {
+    console.error("[Firebase] Error setting auth persistence:", error);
+  });
+
 export const googleProvider = new GoogleAuthProvider();
 
 console.log("[Firebase] Auth app options:", auth.app.options);

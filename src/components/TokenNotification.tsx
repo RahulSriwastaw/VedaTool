@@ -23,9 +23,9 @@ const TokenNotification: React.FC = () => {
       }, 5000);
     };
 
-    window.addEventListener("veda-token-deduction", handleDeduction);
+    window.addEventListener("whiteboard-token-deduction", handleDeduction);
     return () => {
-      window.removeEventListener("veda-token-deduction", handleDeduction);
+      window.removeEventListener("whiteboard-token-deduction", handleDeduction);
     };
   }, []);
 

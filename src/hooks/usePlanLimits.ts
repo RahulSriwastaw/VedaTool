@@ -345,7 +345,7 @@ export const usePlanLimits = () => {
       setTokens(nextTokens);
 
       window.dispatchEvent(
-        new CustomEvent("veda-token-deduction", {
+        new CustomEvent("whiteboard-token-deduction", {
           detail: {
             amount,
             remaining: nextTokens,

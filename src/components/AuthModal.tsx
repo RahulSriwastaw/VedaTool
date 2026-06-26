@@ -87,13 +87,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setLoading(true);
     setError(null);
     try {
+      let userCredential;
       if (isSignUp) {
-        const uCred = await createUserWithEmailAndPassword(
+        userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
           password,
         );
-        const signedUpUser = uCred.user;
+        const signedUpUser = userCredential.user;
         if (signedUpUser) {
           await updateProfile(signedUpUser, {
             displayName: fullName.trim(),
@@ -111,7 +112,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           );
         }
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
       onClose();
       resetFields();

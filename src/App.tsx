@@ -7,7 +7,6 @@ import { PdfArranger } from "./components/PdfArranger";
 import PdfToDocxConverter from "./components/PdfToDocxConverter";
 import PdfWatermarkRemover from "./components/PdfWatermarkRemover/index.tsx";
 import McqWorkspace from "./components/McqWorkspace";
-import VedaRank from "./components/VedaRank";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LandingPage from "./components/LandingPage";
 import Navbar from "./components/Navbar";
@@ -94,6 +93,7 @@ function AppContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [hasTriggeredAuth, setHasTriggeredAuth] = useState(false);
+  const [checkingRedirectResult, setCheckingRedirectResult] = useState(true);
   const [iframeCookieBlocked, setIframeCookieBlocked] = useState(false);
   const [showCookieAlert, setShowCookieAlert] = useState(true);
   const location = useLocation();
@@ -145,24 +145,42 @@ function AppContent() {
       .then((redirectUser) => {
         if (redirectUser) {
           setShowAuthModal(false);
+          setHasTriggeredAuth(true);
+          if (location.pathname === "/" || location.pathname === "/login") {
+            navigate("/hub");
+          }
         }
       })
       .catch((err) => {
         console.error("[GoogleAuth] Redirect result error:", err);
+      })
+      .finally(() => {
+        setCheckingRedirectResult(false);
       });
   }, []);
 
   useEffect(() => {
-    if (!loading && !user && !hasTriggeredAuth) {
+    if (!loading && user) {
+      setHasTriggeredAuth(true);
+      setShowAuthModal(false);
+      // If user is on landing page, redirect to hub
+      if (location.pathname === "/") {
+        navigate("/hub");
+      }
+    }
+  }, [user, loading, location.pathname, navigate]);
+
+  useEffect(() => {
+    if (!loading && !checkingRedirectResult && !user && !hasTriggeredAuth) {
       const timer = setTimeout(() => {
         setShowAuthModal(true);
         setHasTriggeredAuth(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [user, loading, hasTriggeredAuth]);
+  }, [user, loading, hasTriggeredAuth, checkingRedirectResult]);
 
-  if (loading) {
+  if (loading || checkingRedirectResult) {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
         <AnalyticsTracker />
@@ -187,7 +205,7 @@ function AppContent() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen max-w-[100vw] overflow-x-hidden bg-[var(--bg-page)] font-sans">
-        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+        <AuthModal isOpen={showAuthModal && !user} onClose={() => setShowAuthModal(false)} />
         <TokenNotification />
         <ToastNotification />
         <AnalyticsTracker />
@@ -227,14 +245,6 @@ function AppContent() {
         <div className={`transition-all duration-200 ease-in-out ${showSidebar ? (sidebarCollapsed ? "sm:pl-[56px]" : "sm:pl-[260px]") : ""}`}>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-            <Route
-              path="/veda-rank"
-              element={
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <VedaRank />
-                </motion.div>
-              }
-            />
             <Route
               path="/"
               element={
