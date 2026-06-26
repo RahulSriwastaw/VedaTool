@@ -37,11 +37,12 @@ h1, h2, h3, h4, h5, h6 {
 
 #root { min-height: 100vh; background: var(--bg-primary); display: flex; flex-direction: column; }
 
-/* Custom utility classes */
-@utility glass {
-  background: rgba(10, 10, 12, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+@layer utilities {
+  .glass {
+    background: rgba(10, 10, 12, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
 }
 
 /* Scrollbar */
