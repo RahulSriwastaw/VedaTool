@@ -32,5 +32,9 @@
     "src/**/*",
     "server.ts",
     "test-server.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "vedarank-app"
   ]
 }
